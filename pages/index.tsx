@@ -6,8 +6,11 @@ import "react-toastify/dist/ReactToastify.css";
 
 import Head from "next/head";
 import abi from "../utils/CoffeePortal.json";
+declare var window: any
 
 export default function Home() {
+
+
   /**
    * Create a variable here that holds the contract address after you deploy!
    */
@@ -65,7 +68,7 @@ export default function Home() {
         });
       }
     } catch (error) {
-      toast.error(`${error.message}`, {
+      toast.error(`{error.message}`, {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -168,7 +171,7 @@ export default function Home() {
         console.log("Ethereum object doesn't exist!");
       }
     } catch (error) {
-      toast.error(`${error.message}`, {
+      toast.error(`{error.message}`, {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -204,7 +207,7 @@ export default function Home() {
          * We only need address, timestamp, name, and message in our UI so let's
          * pick those out
          */
-        const coffeeCleaned = coffees.map((coffee) => {
+        const coffeeCleaned = coffees.map((coffee: any) => {
           return {
             address: coffee.giver,
             timestamp: new Date(coffee.timestamp * 1000),
@@ -320,7 +323,7 @@ export default function Home() {
 
                 <textarea
                   className="form-textarea mt-1 block w-full shadow appearance-none py-2 px-3 border rounded text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  rows="3"
+                  rows={3}
                   placeholder="Message"
                   id="message"
                   onChange={handleOnMessageChange}
