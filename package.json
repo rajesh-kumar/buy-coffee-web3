@@ -1,13 +1,25 @@
 {
+  "name": "vercel-test",
+  "version": "0.0.0",
   "private": true,
+  "description": "An example project for Web2 & Web3 Login",
+  "repository": "https://github.com/rajesh-kumar/vercel-test.git",
+  "bugs": {
+    "url": "https://github.com/rajesh-kumar/vercel-test/issues"
+  },
+  "homepage": "https://vercel-test-seven-ecru.vercel.app",
+  "main": "",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "types": "tsc --noEmit"
   },
   "dependencies": {
     "ethers": "^5.5.4",
     "next": "latest",
+    "next-auth": "latest",
+    "nodemailer": "^6.6.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-toastify": "^8.2.0"

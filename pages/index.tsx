@@ -1,8 +1,12 @@
 import type { NextPage } from 'next'
 import React, { useEffect, useState } from "react";
+import { signIn, signOut, useSession } from "next-auth/react"
 import { ToastContainer, toast } from "react-toastify";
 import { ethers } from "ethers";
 import "react-toastify/dist/ReactToastify.css";
+import Layout from "../components/layout";
+import AccessDenied from "../components/access-denied"
+import styles from "../components/header.module.css"
 
 import Head from "next/head";
 import abi from "../utils/CoffeePortal.json";
@@ -10,6 +14,9 @@ declare var window: any
 
 export default function Home() {
 
+  const { data: session, status } = useSession()
+  const loading = status === "loading"
+  const [content, setContent] = useState()
 
   /**
    * Create a variable here that holds the contract address after you deploy!
@@ -277,10 +284,82 @@ export default function Home() {
     setName(value);
   };
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
+  if (!session && !currentAccount) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <Head>
-        <title>Mini Buy Me a Coffee</title>
+        <title>Buy Me a Coffee</title>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
+      <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
+        <h1 className="text-6xl font-bold text-blue-600 mb-6">
+          Buy Me A Coffee
+        </h1>
+        <div>
+          <a className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-full mt-3"
+            href="/api/auth/signin"
+            onClick={(e) => {
+              e.preventDefault()
+              signIn()
+            }}
+          >
+            Sign in with Web 2.0 Auth Providers
+          </a>
+        </div>
+
+        <div>
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-full mt-3"
+            onClick={connectWallet}>
+            Sign in with Web 3.0 Auth Providers
+          </button>
+        </div>
+      </main>
+    </div>
+    )
+  }
+
+
+
+  return (
+
+    <div className="flex flex-col items-center justify-center min-h-screen py-2">
+
+      <p
+        className={`nojs-show ${
+          !session && loading ? styles.loading : styles.loaded
+        }`}
+      >
+        {session?.user && (
+          <>
+            {session.user.image && (
+              <span
+                style={{ backgroundImage: `url('${session.user.image}')` }}
+                className={styles.avatar}
+              />
+            )}
+            <span className={styles.signedInText}>
+              <small>Signed in as</small>
+              <br />
+              <strong>{session.user.email ?? session.user.name}</strong>
+            </span>
+            <a
+              href={`/api/auth/signout`}
+              className={styles.button}
+              onClick={(e) => {
+                e.preventDefault()
+                signOut()
+              }}
+            >
+              Sign out
+            </a>
+          </>
+        )}
+      </p>
+
+      <Head>
+        <title>Buy Me a Coffee</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -293,65 +372,68 @@ export default function Home() {
          * If there is currentAccount render this form, else render a button to connect wallet
          */}
 
-        {currentAccount ? (
-          <div className="w-full max-w-xs sticky top-3 z-50 ">
-            <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="name"
+        
+        <div className="w-full max-w-xs sticky top-3 z-50 ">
+          <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="name"
+              >
+                Name
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="name"
+                type="text"
+                placeholder="Name"
+                onChange={handleOnNameChange}
+                required
+              />
+            </div>
+
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="message"
+              >
+                Send the Creator a Message
+              </label>
+
+              <textarea
+                className="form-textarea mt-1 block w-full shadow appearance-none py-2 px-3 border rounded text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                rows={3}
+                placeholder="Message"
+                id="message"
+                onChange={handleOnMessageChange}
+                required
+              ></textarea>
+            </div>
+
+            {session && (
+              <div className="flex items-left justify-between">
+                <button
+                  className="bg-blue-500 hover:bg-blue-700 text-center text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  type="button"
                 >
-                  Name
-                </label>
-                <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="name"
-                  type="text"
-                  placeholder="Name"
-                  onChange={handleOnNameChange}
-                  required
-                />
+                  Support $5 via Stripe
+                </button>
               </div>
+            )}
 
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                  htmlFor="message"
-                >
-                  Send the Creator a Message
-                </label>
-
-                <textarea
-                  className="form-textarea mt-1 block w-full shadow appearance-none py-2 px-3 border rounded text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  rows={3}
-                  placeholder="Message"
-                  id="message"
-                  onChange={handleOnMessageChange}
-                  required
-                ></textarea>
-              </div>
-
+            {currentAccount && (
               <div className="flex items-left justify-between">
                 <button
                   className="bg-blue-500 hover:bg-blue-700 text-center text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                   type="button"
                   onClick={buyCoffee}
                 >
-                  Support $5
+                  Support $5 via Crypto
                 </button>
               </div>
-            </form>
-          </div>
-        ) : (
-          <div>
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-full mt-3"
-              onClick={connectWallet}
-            >
-              Connect Your Wallet
-            </button>
-          </div>
-        )}
+            )}
+          </form>
+        </div>
 
         {allCoffee.map((coffee, index) => {
           return (
