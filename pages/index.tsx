@@ -4,9 +4,9 @@ import { signIn, signOut, useSession } from "next-auth/react"
 import { ToastContainer, toast } from "react-toastify";
 import { ethers } from "ethers";
 import "react-toastify/dist/ReactToastify.css";
-import Layout from "../components/layout";
-import AccessDenied from "../components/access-denied"
-import styles from "../components/header.module.css"
+import styles from "../styles/header.module.css";
+
+import Link from 'next/link'
 
 import Head from "next/head";
 import abi from "../utils/CoffeePortal.json";
@@ -412,12 +412,9 @@ export default function Home() {
 
             {session && (
               <div className="flex items-left justify-between">
-                <button
-                  className="bg-blue-500 hover:bg-blue-700 text-center text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                  type="button"
-                >
-                  Support $5 via Stripe
-                </button>
+                <Link href="/donate-with-checkout" >
+                  <a className="bg-blue-500 hover:bg-blue-700 text-center text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Support $5 via Stripe</a>
+                </Link>
               </div>
             )}
 
